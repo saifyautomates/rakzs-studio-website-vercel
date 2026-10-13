@@ -215,6 +215,104 @@
     }, {passive:true});
   }
 
+  // --- In-Site Video Modal Player ---
+  const vmModal = document.getElementById('videoModal');
+  const vmVideo = document.getElementById('vmVideo');
+  const vmClose = document.getElementById('vmClose');
+  const vmBackdrop = document.getElementById('vmBackdrop');
+  const vmTag = document.getElementById('vmTag');
+  const vmTitle = document.getElementById('vmTitle');
+  const vmSub = document.getElementById('vmSub');
+  const vmWaBtn = document.getElementById('vmWaBtn');
+  let vmLastFocus = null;
+
+  function openVideoModal(videoSrc, posterSrc, title, sub, tag) {
+    if (!vmModal || !vmVideo) return;
+    vmLastFocus = document.activeElement;
+    if (vmTag) vmTag.textContent = tag || 'Rakzs Film';
+    if (vmTitle) vmTitle.textContent = title || 'Cinematic Film';
+    if (vmSub) vmSub.textContent = sub || 'Rakzs Studio Motion';
+    if (vmWaBtn) {
+      const waText = encodeURIComponent('Hi Rakzs Studio, I saw your "' + (title || 'wedding') + '" film on the website and would like to enquire.');
+      vmWaBtn.href = 'https://wa.me/918522059034?text=' + waText;
+    }
+    vmVideo.poster = posterSrc || '';
+    vmVideo.src = videoSrc;
+    vmModal.hidden = false;
+    document.body.classList.add('modal-open');
+    requestAnimationFrame(() => {
+      vmModal.classList.add('open');
+      if (vmClose) vmClose.focus();
+    });
+    const playPromise = vmVideo.play();
+    if (playPromise !== undefined) {
+      playPromise.catch(() => {
+        // Autoplay may need user gesture, video controls are ready
+      });
+    }
+  }
+
+  function closeVideoModal() {
+    if (!vmModal || !vmVideo) return;
+    vmModal.classList.remove('open');
+    document.body.classList.remove('modal-open');
+    try {
+      vmVideo.pause();
+      vmVideo.removeAttribute('src');
+      vmVideo.load();
+    } catch (_) {}
+    setTimeout(() => {
+      vmModal.hidden = true;
+    }, 320);
+    if (vmLastFocus && typeof vmLastFocus.focus === 'function') {
+      vmLastFocus.focus();
+    }
+  }
+
+  if (vmClose) vmClose.addEventListener('click', closeVideoModal);
+  if (vmBackdrop) vmBackdrop.addEventListener('click', closeVideoModal);
+
+  document.addEventListener('keydown', e => {
+    if (!vmModal || vmModal.hidden) return;
+    if (e.key === 'Escape') closeVideoModal();
+  });
+
+  // Attach click handlers to all film & story cards
+  const videoTriggers = document.querySelectorAll('.film-card[data-video], .story-card[data-video]');
+  videoTriggers.forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.preventDefault();
+      const videoSrc = btn.dataset.video;
+      const posterSrc = btn.dataset.poster;
+      const title = btn.dataset.title;
+      const sub = btn.dataset.sub;
+      const tag = btn.dataset.no;
+      if (videoSrc) {
+        openVideoModal(videoSrc, posterSrc, title, sub, tag);
+      }
+    });
+  });
+
+  // Also make about image clickable to open full photo
+  const aboutImg = document.querySelector('.about-image');
+  if (aboutImg) {
+    aboutImg.style.cursor = 'pointer';
+    aboutImg.setAttribute('role', 'button');
+    aboutImg.setAttribute('aria-label', 'View photo in gallery');
+    aboutImg.tabIndex = 0;
+    const triggerAboutPhoto = () => {
+      const idx = photos.findIndex(p => p.src.includes('portrait-window-light'));
+      if (idx !== -1) openLightbox(idx);
+    };
+    aboutImg.addEventListener('click', triggerAboutPhoto);
+    aboutImg.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        triggerAboutPhoto();
+      }
+    });
+  }
+
   // --- Preloader Handling ---
   const reduce = matchMedia('(prefers-reduced-motion:reduce)').matches;
   const pre = document.getElementById('preloader');
