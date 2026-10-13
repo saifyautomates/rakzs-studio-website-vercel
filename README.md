@@ -1,42 +1,38 @@
 # Rakzs Studio — Official Website
 
 > **"We Capture Memories"**  
-> Premium portfolio and enquiry website for Rakzs Studio — covering weddings, pre-weddings, portraits, parties, and corporate events.
+> Luxury photography and cinema portfolio for Rakzs Studio — covering weddings, pre-weddings, portraits, parties, and corporate events.
 
 ---
 
-## 🌟 Overview
+## 📁 Architectural Separation (`frontend` & `backend`)
 
-Rakzs Studio's website is a high-performance, dark-luxury photography portfolio designed with high aesthetic standards:
-- **Rich Aesthetic Design**: Cormorant Garamond & Inter typography, gold accent palette, subtle grain texture, and silky smooth micro-interactions.
-- **Optimized Media Architecture**: Standalone lightweight WebP/JPEG assets extracted from inline payloads, reducing initial HTML document size by **99.6%** (from 15MB down to ~24KB).
-- **Interactive Lightbox**: Full-screen modal viewer with keyboard navigation (`Esc`, `ArrowLeft`, `ArrowRight`) and touch swipe gestures.
-- **Direct Lead Generation**: Seamless inquiry routing directly to **WhatsApp** and **Instagram DM**, complete with pre-filled event details and custom collection selection.
-- **Vercel Edge Ready**: Pre-configured with `vercel.json` for immutable static asset caching and HTTP security headers.
-
----
-
-## 📁 Project Structure
+This project is organized into dedicated `frontend` and `backend` modules for clean separation of concerns:
 
 ```
 rakzs-studio-website-vercel/
-├── assets/
-│   ├── css/
-│   │   └── styles.css          # Modular production stylesheet
-│   ├── js/
-│   │   └── main.js             # Filter, lightbox, animations, enquiry JS
-│   └── images/                 # Optimized photographic assets & logos
-│       ├── logo.jpg
-│       ├── hero-wedding.jpg
-│       ├── film-wedding-vandhana.jpg
-│       ├── portrait-window-light.webp
-│       └── ...
-├── index.html                  # Semantic, SEO-optimized HTML5 document
-├── vercel.json                 # Caching & security headers for Vercel
-├── robots.txt                  # Search engine directives
-├── sitemap.xml                 # SEO sitemap
-├── manifest.webmanifest        # PWA & web application manifest
-├── package.json                # Project scripts
+├── frontend/                     # Client-facing UI & assets
+│   ├── assets/
+│   │   ├── css/
+│   │   │   └── styles.css        # Luxury dark-gold aesthetic stylesheet
+│   │   ├── js/
+│   │   │   └── main.js           # Filtering, lightbox, animations & form logic
+│   │   └── images/               # Optimized WebP & progressive JPEG assets
+│   ├── index.html                # Semantic, SEO-optimized HTML5 entry point
+│   ├── manifest.webmanifest      # Mobile PWA web manifest
+│   ├── robots.txt                # Search crawler rules
+│   └── sitemap.xml               # Search engine index sitemap
+│
+├── backend/                      # Server & API services
+│   ├── api/
+│   │   ├── enquiry.js            # Serverless lead validator & router
+│   │   └── health.js             # API health check endpoint
+│   ├── server.js                 # Zero-dependency local Node.js static & API server
+│   └── package.json              # Backend package metadata
+│
+├── vercel.json                   # Vercel Edge routing (rewrites to frontend & backend)
+├── package.json                  # Root scripts (`npm start` launches backend server)
+├── .gitignore
 └── README.md
 ```
 
@@ -44,32 +40,33 @@ rakzs-studio-website-vercel/
 
 ## 🚀 Running Locally
 
-You can run the site using any static web server:
+To run the full stack locally:
 
 ```bash
-# Using Node.js / npx:
-npx serve .
-
-# Or using Python:
-python -m http.server 3000
+# From root directory:
+npm start
+# or:
+node backend/server.js
 ```
 
-Open [http://localhost:3000](http://localhost:3000) in your browser.
+- **Frontend Website**: [http://127.0.0.1:3000](http://127.0.0.1:3000)
+- **Backend Health Check**: [http://127.0.0.1:3000/api/health](http://127.0.0.1:3000/api/health)
 
 ---
 
 ## ☁️ Deploying to Vercel
 
-### Option 1: Vercel CLI
+The project is pre-configured with `vercel.json` rewrites:
+- Routes `/(.*)` seamlessly to `/frontend/$1`.
+- Routes `/api/(.*)` to `/backend/api/$1`.
+- Implements 1-year immutable caching on static assets (`Cache-Control: public, max-age=31536000, immutable`).
+- Applies strict HTTP security headers (`X-Frame-Options`, `X-Content-Type-Options`, `Referrer-Policy`).
+
+To deploy:
 ```bash
 npx vercel
 ```
-
-### Option 2: GitHub Integration
-1. Push this repository to GitHub.
-2. Import the repository in your [Vercel Dashboard](https://vercel.com/new).
-3. Framework preset: **Other** / **Static Site**.
-4. Click **Deploy**.
+Or connect this GitHub repository in your Vercel dashboard.
 
 ---
 

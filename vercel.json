@@ -2,6 +2,20 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "cleanUrls": true,
   "trailingSlash": false,
+  "rewrites": [
+    {
+      "source": "/api/health",
+      "destination": "/backend/api/health.js"
+    },
+    {
+      "source": "/api/enquiry",
+      "destination": "/backend/api/enquiry.js"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/frontend/$1"
+    }
+  ],
   "headers": [
     {
       "source": "/(.*)",

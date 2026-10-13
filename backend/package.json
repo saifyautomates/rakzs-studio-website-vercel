@@ -1,0 +1,12 @@
+{
+  "name": "rakzs-studio-backend",
+  "version": "1.0.0",
+  "description": "Backend API and local static server for Rakzs Studio website",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "keywords": ["backend", "api", "rakzs-studio"],
+  "author": "Rakzs Studio",
+  "license": "UNLICENSED"
+}

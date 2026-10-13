@@ -2,10 +2,9 @@
   "name": "rakzs-studio-website-vercel",
   "version": "1.0.0",
   "description": "Official website for Rakzs Studio — Wedding, Portrait & Event Photography & Films",
-  "main": "index.html",
   "scripts": {
-    "dev": "node server.js",
-    "start": "node server.js"
+    "dev": "node backend/server.js",
+    "start": "node backend/server.js"
   },
   "keywords": [
     "rakzs-studio",
