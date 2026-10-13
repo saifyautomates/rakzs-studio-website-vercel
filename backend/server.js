@@ -34,7 +34,7 @@ const server = http.createServer((req, res) => {
     }));
   }
 
-  if (reqUrl === '/api/enquire' && req.method === 'POST') {
+  if ((reqUrl === '/api/enquire' || reqUrl === '/api/enquiry') && req.method === 'POST') {
     let body = '';
     req.on('data', chunk => { body += chunk; });
     req.on('end', () => {
@@ -84,7 +84,7 @@ const server = http.createServer((req, res) => {
 });
 
 const PORT = process.env.PORT || 3000;
-server.listen(PORT, '127.0.0.1', () => {
-  console.log(`Backend server active on http://127.0.0.1:${PORT}`);
+server.listen(PORT, () => {
+  console.log(`Backend server active on http://localhost:${PORT}`);
   console.log(`Serving frontend from: ${FRONTEND_DIR}`);
 });

@@ -444,6 +444,19 @@
 
       const text = `Hi Rakzs Studio! I'm ${name} (${phone}).\nEvent date: ${date}${city ? '\nVenue / city: ' + city : ''}${msg ? '\nDetails: ' + msg : ''}\nPlease share availability and collection details.`;
 
+      // Update hidden input for fallback
+      const hiddenMsg = document.getElementById('whatsappMessage');
+      if (hiddenMsg) hiddenMsg.value = text;
+
+      // Asynchronously log lead to backend API without blocking user
+      try {
+        fetch('/api/enquiry', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, phone, date, city, message: msg })
+        }).catch(() => {});
+      } catch (_) {}
+
       const waUrl = 'https://wa.me/918522059034?text=' + encodeURIComponent(text);
 
       if (status) {

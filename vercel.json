@@ -12,6 +12,10 @@
       "destination": "/backend/api/enquiry.js"
     },
     {
+      "source": "/api/enquire",
+      "destination": "/backend/api/enquire.js"
+    },
+    {
       "source": "/(.*)",
       "destination": "/frontend/$1"
     }
