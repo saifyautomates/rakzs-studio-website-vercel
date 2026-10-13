@@ -30,3 +30,51 @@
     @media(max-width:720px){.section-head-split{display:block}.section-head-split .intro{margin-top:24px}.film-grid,.stories-grid{grid-template-columns:1fr}.film-card{min-height:520px}.film-copy,.story-copy{transform:none}.film-watch,.story-copy .text-link{opacity:1;transform:none}.story-card:first-child,.story-card:nth-child(2),.story-card:nth-child(3){grid-column:auto;min-height:520px;margin-top:0}.pullquote{padding-inline:18px}.about-craft{grid-template-columns:1fr}.faq-item summary{grid-template-columns:34px 1fr auto;gap:8px}.faq-answer{padding-left:42px}.footer-wordmark{white-space:normal;line-height:.82;margin-bottom:44px}}
     @media(max-width:430px){.shell,.hero-copy{width:calc(100% - 28px)}.hero h1{font-size:clamp(3.2rem,17vw,5rem)}.hero-label{font-size:.6rem}.hero-bottom{margin-top:26px}.actions{display:grid;grid-template-columns:1fr 1fr}.btn{padding-inline:14px;font-size:.62rem}.heading{font-size:2.8rem}.category:nth-child(n){margin-inline:0}.masonry{columns:1}.portfolio-head .heading{font-size:3.2rem}.filters{display:grid;grid-template-columns:1fr 1fr}.filter{text-align:center}.steps .step{grid-template-columns:52px 1fr;gap:12px}.form{grid-template-columns:1fr}.field.full,.error,.form .btn{grid-column:auto}.direct-row{grid-template-columns:34px 1fr auto}.about-image{width:100%}}
     @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*:before,*:after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}.hero-media img{animation:none}.marquee-track{animation:none}.reveal{opacity:1;transform:none}}
+
+/* --- World-Class Luxury Polish & Interactive Enhancements --- */
+.scroll-progress{position:fixed;top:0;left:0;height:2.5px;width:0%;background:linear-gradient(90deg,var(--gold),var(--gold2));z-index:9999;pointer-events:none;transition:width .12s cubic-bezier(.2,.8,.2,1)}
+.cursor-glow{position:fixed;width:440px;height:440px;border-radius:50%;background:radial-gradient(circle,rgba(212,175,55,.055) 0%,transparent 65%);pointer-events:none;z-index:998;transform:translate(-50%,-50%);transition:opacity .35s ease;opacity:0}
+body:hover .cursor-glow{opacity:1}
+@media(pointer:coarse){.cursor-glow{display:none!important}}
+
+.back-to-top{position:fixed;left:24px;bottom:24px;z-index:85;width:44px;height:44px;border-radius:50%;background:rgba(23,21,18,.85);backdrop-filter:blur(10px);border:1px solid var(--line);color:var(--gold);display:grid;place-items:center;opacity:0;visibility:hidden;transform:translateY(12px);transition:.35s var(--ease);cursor:pointer}
+.back-to-top.show{opacity:1;visibility:visible;transform:none}
+.back-to-top:hover{border-color:var(--gold);background:var(--panel);color:var(--gold2);transform:translateY(-2px)}
+@media(max-width:720px){.back-to-top{left:auto;right:18px;bottom:80px;width:40px;height:40px}}
+
+.wa-float{position:fixed;right:24px;bottom:24px;z-index:90;width:56px;height:56px;border-radius:50%;display:grid;place-items:center;background:var(--gold);color:#100e09;box-shadow:0 14px 30px rgba(0,0,0,.35);transition:.3s}
+.wa-float:before{content:"";position:absolute;inset:-6px;border-radius:50%;border:1px solid rgba(212,175,55,.6);animation:radarPulse 2.5s cubic-bezier(.2,.8,.2,1) infinite;pointer-events:none}
+@keyframes radarPulse{0%{transform:scale(.92);opacity:.85}100%{transform:scale(1.45);opacity:0}}
+
+.filter{position:relative;display:inline-flex;align-items:center;gap:6px}
+.filter-count{font-size:.6rem;opacity:.8;padding:2px 7px;border-radius:10px;background:rgba(212,175,55,.1);color:var(--gold);font-weight:600}
+.filter.active .filter-count{background:var(--gold);color:#100e09}
+
+/* Testimonials / Love Notes */
+.testimonials{background:linear-gradient(180deg,var(--bg),var(--bg2));border-block:1px solid var(--line)}
+.testimonials-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:54px}
+.test-card{background:var(--panel);border:1px solid var(--line);padding:36px 30px;display:flex;flex-direction:column;justify-content:space-between;position:relative;transition:.4s var(--ease)}
+.test-card:hover{border-color:rgba(212,175,55,.5);transform:translateY(-4px);box-shadow:0 18px 40px rgba(0,0,0,.35)}
+.stars{color:var(--gold);font-size:.92rem;letter-spacing:3px;margin-bottom:18px}
+.test-card blockquote{font:italic 400 1.22rem/1.65 var(--serif);color:#e8e1d5;margin-bottom:28px}
+.test-author strong{display:block;font-size:.88rem;font-weight:500;color:var(--ink)}
+.test-author span{display:block;font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);margin-top:3px}
+
+/* Interactive Enquiry Chips */
+.chips-group{grid-column:1/-1;margin-top:-4px;margin-bottom:6px}
+.chips-label{display:block;font-size:.62rem;letter-spacing:.19em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+.chips-row{display:flex;flex-wrap:wrap;gap:8px}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border:1px solid var(--line);background:rgba(23,21,18,.6);color:var(--muted);font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;border-radius:24px;cursor:pointer;transition:.25s var(--ease)}
+.chip:hover{border-color:var(--gold);color:var(--gold)}
+.chip.active{background:rgba(212,175,55,.14);border-color:var(--gold);color:var(--gold2);font-weight:500}
+.char-count{display:block;text-align:right;font-size:.64rem;color:#7e7467;margin-top:4px}
+
+/* Lightbox Enhancements */
+.lb-hints{display:flex;align-items:center;justify-content:center;gap:12px;margin-top:16px;color:#8f8576;font-size:.64rem;letter-spacing:.16em;text-transform:uppercase}
+.lb-hint-pill{padding:3px 8px;border:1px solid rgba(212,175,55,.2);border-radius:4px;color:var(--gold)}
+#lbImage{transition:opacity .2s ease-in-out,transform .2s ease-in-out}
+#lbImage.fading{opacity:0;transform:scale(.98)}
+
+@media(max-width:1000px){
+  .testimonials-grid{grid-template-columns:1fr;gap:14px}
+}

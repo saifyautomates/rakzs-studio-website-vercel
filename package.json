@@ -4,8 +4,8 @@
   "description": "Official website for Rakzs Studio — Wedding, Portrait & Event Photography & Films",
   "main": "index.html",
   "scripts": {
-    "dev": "npx -y serve .",
-    "start": "npx -y serve ."
+    "dev": "node server.js",
+    "start": "node server.js"
   },
   "keywords": [
     "rakzs-studio",

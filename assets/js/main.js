@@ -60,9 +60,19 @@
     });
   }
 
-  // Filtering
+  // Filter count helper
   const filters = [...document.querySelectorAll('.filter')];
   const shots = [...document.querySelectorAll('.shot')];
+  
+  filters.forEach(btn => {
+    const key = btn.dataset.filter;
+    const count = key === 'all' ? photos.length : photos.filter(p => p.cat === key).length;
+    const countSpan = document.createElement('span');
+    countSpan.className = 'filter-count';
+    countSpan.textContent = count;
+    btn.appendChild(countSpan);
+  });
+
   function setFilter(key) {
     filters.forEach(b => {
       const on = b.dataset.filter === key;
@@ -89,21 +99,34 @@
 
   const visible = () => shots.filter(s => !s.classList.contains('hidden')).map(s => +s.dataset.index);
 
-  function render() {
+  function render(isStep) {
     const p = photos[current];
     const v = visible();
     if (!p) return;
-    lbImg.src = p.src;
-    lbImg.alt = p.title;
-    lbCap.textContent = p.title + ' · ' + p.label;
+    
+    if (isStep && lbImg) {
+      lbImg.classList.add('fading');
+      setTimeout(() => {
+        lbImg.src = p.src;
+        lbImg.alt = p.title;
+        lbImg.classList.remove('fading');
+      }, 150);
+    } else if (lbImg) {
+      lbImg.src = p.src;
+      lbImg.alt = p.title;
+    }
+    
+    if (lbCap) lbCap.textContent = p.title + ' · ' + p.label;
     const idx = v.indexOf(current);
-    lbCount.textContent = (idx >= 0 ? idx + 1 : 1) + ' / ' + (v.length || photos.length);
+    if (lbCount) {
+      lbCount.textContent = (idx >= 0 ? idx + 1 : 1) + ' / ' + (v.length || photos.length);
+    }
   }
 
   function openLightbox(i) {
     lastFocus = document.activeElement;
     current = i;
-    render();
+    render(false);
     lb.hidden = false;
     document.body.classList.add('modal-open');
     requestAnimationFrame(() => lb.classList.add('open'));
@@ -124,7 +147,7 @@
     let x = v.indexOf(current);
     if (x === -1) x = 0;
     current = v[(x + d + v.length) % v.length];
-    render();
+    render(true);
   }
 
   const lbClose = document.getElementById('lbClose');
@@ -171,19 +194,47 @@
       setTimeout(hidePre, 300);
     } else {
       window.addEventListener('load', () => setTimeout(hidePre, 350));
-      setTimeout(hidePre, 1500); // safety fallback
+      setTimeout(hidePre, 1500);
     }
     pre.onclick = hidePre;
   }
 
-  // Navigation
+  // Navigation & Scroll Progress & Back-to-Top
   const nav = document.getElementById('siteNav');
   const menu = document.getElementById('menuBtn');
   const links = document.getElementById('navLinks');
+  const progress = document.getElementById('scrollProgress');
+  const backToTop = document.getElementById('backToTop');
 
-  if (nav) {
-    window.addEventListener('scroll', () => {
-      nav.classList.toggle('scrolled', window.scrollY > 30);
+  window.addEventListener('scroll', () => {
+    const scrollY = window.scrollY;
+    if (nav) nav.classList.toggle('scrolled', scrollY > 30);
+    
+    // Scroll progress bar
+    if (progress) {
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const pct = docHeight > 0 ? (scrollY / docHeight) * 100 : 0;
+      progress.style.width = Math.min(100, Math.max(0, pct)) + '%';
+    }
+
+    // Back to top visibility
+    if (backToTop) {
+      backToTop.classList.toggle('show', scrollY > 400);
+    }
+  }, {passive:true});
+
+  if (backToTop) {
+    backToTop.addEventListener('click', () => {
+      window.scrollTo({top: 0, behavior: 'smooth'});
+    });
+  }
+
+  // Cursor Spotlight for Desktop
+  const glow = document.getElementById('cursorGlow');
+  if (glow && window.matchMedia('(pointer: fine)').matches) {
+    window.addEventListener('mousemove', e => {
+      glow.style.left = e.clientX + 'px';
+      glow.style.top = e.clientY + 'px';
     }, {passive:true});
   }
 
@@ -205,7 +256,6 @@
       };
     });
 
-    // Close on Escape
     document.addEventListener('keydown', e => {
       if (e.key === 'Escape' && links.classList.contains('open')) {
         links.classList.remove('open');
@@ -215,7 +265,6 @@
       }
     });
 
-    // Reset when resizing to desktop
     window.addEventListener('resize', () => {
       if (window.innerWidth > 1120 && links.classList.contains('open')) {
         links.classList.remove('open');
@@ -244,15 +293,51 @@
     dateInput.min = today;
   }
 
+  // Event Type Quick Chips
+  const eventChips = document.querySelectorAll('#eventTypeChips .chip');
+  const msgEl = document.getElementById('message');
+  const charCount = document.getElementById('charCount');
+
+  if (msgEl && charCount) {
+    const updateCount = () => {
+      charCount.textContent = msgEl.value.length + ' / 800';
+    };
+    msgEl.addEventListener('input', updateCount);
+    updateCount();
+  }
+
+  let selectedEventType = '';
+  eventChips.forEach(chip => {
+    chip.addEventListener('click', () => {
+      const ev = chip.dataset.event;
+      if (selectedEventType === ev) {
+        chip.classList.remove('active');
+        selectedEventType = '';
+      } else {
+        eventChips.forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
+        selectedEventType = ev;
+        if (msgEl) {
+          const prefix = `Celebrating: ${ev}`;
+          // Replace or prepend
+          if (!msgEl.value.includes(prefix)) {
+            msgEl.value = msgEl.value.trim() ? `${prefix}. ${msgEl.value}` : `${prefix}. `;
+            if (charCount) charCount.textContent = msgEl.value.length + ' / 800';
+          }
+        }
+      }
+    });
+  });
+
   // Pricing tier selection
   document.querySelectorAll('.enquire-tier').forEach(a => {
     a.addEventListener('click', () => {
       const tier = a.dataset.tier;
-      const msg = document.getElementById('message');
-      const note = 'I am interested in the ' + tier + ' collection.';
-      if (msg) {
-        if (!msg.value.includes(note)) {
-          msg.value = msg.value.trim() ? note + '\n' + msg.value : note;
+      const note = 'Interested in the ' + tier + ' collection.';
+      if (msgEl) {
+        if (!msgEl.value.includes(note)) {
+          msgEl.value = msgEl.value.trim() ? `${note}\n${msgEl.value}` : note;
+          if (charCount) charCount.textContent = msgEl.value.length + ' / 800';
         }
       }
       const nameInput = document.getElementById('name');
@@ -271,7 +356,6 @@
       const phoneEl = document.getElementById('phone');
       const dateEl = document.getElementById('date');
       const cityEl = document.getElementById('city');
-      const msgEl = document.getElementById('message');
       const err = document.getElementById('formError');
       const status = document.getElementById('formStatus');
 
@@ -305,14 +389,13 @@
       const waUrl = 'https://wa.me/918522059034?text=' + encodeURIComponent(text);
 
       if (status) {
-        status.textContent = 'Redirecting to WhatsApp...';
+        status.textContent = '✓ Opening WhatsApp chat with details...';
         status.hidden = false;
       }
 
       // Open WhatsApp cleanly
       const win = window.open(waUrl, '_blank', 'noopener,noreferrer');
       if (!win || win.closed || typeof win.closed === 'undefined') {
-        // Fallback for strict popup blockers
         window.location.href = waUrl;
       }
     });
