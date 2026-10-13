@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://rakzs-studio-website-vercel.vercel.app/sitemap.xml
