@@ -1,6 +1,7 @@
 (function(){
   'use strict';
 
+  // --- Portfolio & Gallery Data ---
   const photos = [
     {src:'assets/images/wedding-ceremony-colour.webp', cat:'weddings', title:'A ceremony in full colour', label:'Pexels reference'},
     {src:'assets/images/wedding-together-centre.webp', cat:'weddings', title:'Together at the centre', label:'Pexels reference'},
@@ -24,7 +25,25 @@
     {key:'events', name:'Events', line:'Parties and corporate, end to end.', src:'assets/images/event-room-alive.webp'}
   ];
 
-  // Render categories
+  // --- Smooth Scroll Helper with Header Offset ---
+  function smoothScrollTo(targetSelector) {
+    if (!targetSelector || targetSelector === '#') return;
+    if (targetSelector === '#top') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+    const targetEl = document.querySelector(targetSelector);
+    if (!targetEl) return;
+    const headerHeight = 72;
+    const elementPos = targetEl.getBoundingClientRect().top + window.pageYOffset;
+    const offsetPos = elementPos - headerHeight;
+    window.scrollTo({
+      top: Math.max(0, offsetPos),
+      behavior: 'smooth'
+    });
+  }
+
+  // --- Category Grid Generation ---
   const grid = document.getElementById('categoryGrid');
   if (grid) {
     cats.forEach((c, i) => {
@@ -32,12 +51,20 @@
       a.href = '#portfolio';
       a.className = 'category reveal ' + (i ? 'd' + (i + 1) : '');
       a.dataset.goto = c.key;
+      a.setAttribute('role', 'button');
+      a.setAttribute('aria-label', 'View ' + c.name + ' gallery');
       a.innerHTML = '<img src="' + c.src + '" alt="' + c.name + ' photography" loading="lazy"><div class="cat-copy"><span class="cat-num">0' + (i + 1) + '</span><h3>' + c.name + '</h3><p>' + c.line + '</p></div>';
+      
+      a.addEventListener('click', e => {
+        e.preventDefault();
+        setFilter(c.key);
+        smoothScrollTo('#portfolio');
+      });
       grid.appendChild(a);
     });
   }
 
-  // Render masonry
+  // --- Masonry Gallery Generation ---
   const masonry = document.getElementById('masonry');
   if (masonry) {
     photos.forEach((p, i) => {
@@ -47,8 +74,9 @@
       f.dataset.index = i;
       f.tabIndex = 0;
       f.setAttribute('role', 'button');
-      f.setAttribute('aria-label', 'Open ' + p.title);
+      f.setAttribute('aria-label', 'Open full photo: ' + p.title);
       f.innerHTML = '<img src="' + p.src + '" alt="' + p.title + '" loading="lazy" decoding="async"><figcaption class="shot-cap"><strong>' + p.title + '</strong><span>' + p.label + '</span></figcaption>';
+      
       f.addEventListener('click', () => openLightbox(i));
       f.addEventListener('keydown', e => {
         if (e.key === 'Enter' || e.key === ' ') {
@@ -60,10 +88,10 @@
     });
   }
 
-  // Filter count helper
+  // --- Filtering with Dynamic Badges ---
   const filters = [...document.querySelectorAll('.filter')];
   const shots = [...document.querySelectorAll('.shot')];
-  
+
   filters.forEach(btn => {
     const key = btn.dataset.filter;
     const count = key === 'all' ? photos.length : photos.filter(p => p.cat === key).length;
@@ -71,6 +99,8 @@
     countSpan.className = 'filter-count';
     countSpan.textContent = count;
     btn.appendChild(countSpan);
+    
+    btn.addEventListener('click', () => setFilter(key));
   });
 
   function setFilter(key) {
@@ -80,16 +110,23 @@
       b.setAttribute('aria-selected', on);
     });
     shots.forEach(s => {
-      s.classList.toggle('hidden', key !== 'all' && s.dataset.cat !== key);
+      const match = key === 'all' || s.dataset.cat === key;
+      if (match) {
+        s.classList.remove('hidden');
+        s.style.opacity = '0';
+        s.style.transform = 'translateY(12px)';
+        requestAnimationFrame(() => {
+          s.style.transition = 'opacity .4s ease, transform .4s ease';
+          s.style.opacity = '1';
+          s.style.transform = 'translateY(0)';
+        });
+      } else {
+        s.classList.add('hidden');
+      }
     });
   }
 
-  filters.forEach(b => b.addEventListener('click', () => setFilter(b.dataset.filter)));
-  document.querySelectorAll('[data-goto]').forEach(a => {
-    a.addEventListener('click', () => setFilter(a.dataset.goto));
-  });
-
-  // Lightbox
+  // --- Lightbox Modal ---
   const lb = document.getElementById('lightbox');
   const lbImg = document.getElementById('lbImage');
   const lbCap = document.getElementById('lbCaption');
@@ -103,7 +140,7 @@
     const p = photos[current];
     const v = visible();
     if (!p) return;
-    
+
     if (isStep && lbImg) {
       lbImg.classList.add('fading');
       setTimeout(() => {
@@ -115,7 +152,7 @@
       lbImg.src = p.src;
       lbImg.alt = p.title;
     }
-    
+
     if (lbCap) lbCap.textContent = p.title + ' · ' + p.label;
     const idx = v.indexOf(current);
     if (lbCount) {
@@ -178,7 +215,7 @@
     }, {passive:true});
   }
 
-  // Preloader
+  // --- Preloader Handling ---
   const reduce = matchMedia('(prefers-reduced-motion:reduce)').matches;
   const pre = document.getElementById('preloader');
   const hidePre = () => {
@@ -199,17 +236,60 @@
     pre.onclick = hidePre;
   }
 
-  // Navigation & Scroll Progress & Back-to-Top
+  // --- Navigation & Mobile Drawer ---
   const nav = document.getElementById('siteNav');
   const menu = document.getElementById('menuBtn');
   const links = document.getElementById('navLinks');
   const progress = document.getElementById('scrollProgress');
   const backToTop = document.getElementById('backToTop');
 
+  // Close mobile drawer function
+  function closeMobileNav() {
+    if (links && links.classList.contains('open')) {
+      links.classList.remove('open');
+      if (menu) {
+        menu.classList.remove('open');
+        menu.setAttribute('aria-expanded', 'false');
+        menu.setAttribute('aria-label', 'Open menu');
+      }
+      document.body.classList.remove('nav-open');
+    }
+  }
+
+  if (menu && links) {
+    menu.onclick = () => {
+      const open = links.classList.toggle('open');
+      menu.classList.toggle('open', open);
+      menu.setAttribute('aria-expanded', open ? 'true' : 'false');
+      menu.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+      document.body.classList.toggle('nav-open', open);
+    };
+
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') closeMobileNav();
+    });
+
+    window.addEventListener('resize', () => {
+      if (window.innerWidth > 1120) closeMobileNav();
+    }, {passive:true});
+  }
+
+  // --- Universal Smooth Scroll for All Anchor Links ---
+  document.querySelectorAll('a[href^="#"]').forEach(link => {
+    link.addEventListener('click', function(e) {
+      const href = this.getAttribute('href');
+      if (!href || href === '#') return;
+      e.preventDefault();
+      closeMobileNav();
+      smoothScrollTo(href);
+    });
+  });
+
+  // --- Scroll Progress & Header Scrolled & Back to Top ---
   window.addEventListener('scroll', () => {
     const scrollY = window.scrollY;
     if (nav) nav.classList.toggle('scrolled', scrollY > 30);
-    
+
     // Scroll progress bar
     if (progress) {
       const docHeight = document.documentElement.scrollHeight - window.innerHeight;
@@ -225,11 +305,11 @@
 
   if (backToTop) {
     backToTop.addEventListener('click', () => {
-      window.scrollTo({top: 0, behavior: 'smooth'});
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     });
   }
 
-  // Cursor Spotlight for Desktop
+  // --- Desktop Cursor Spotlight ---
   const glow = document.getElementById('cursorGlow');
   if (glow && window.matchMedia('(pointer: fine)').matches) {
     window.addEventListener('mousemove', e => {
@@ -238,44 +318,7 @@
     }, {passive:true});
   }
 
-  if (menu && links) {
-    menu.onclick = () => {
-      const open = links.classList.toggle('open');
-      menu.classList.toggle('open', open);
-      menu.setAttribute('aria-expanded', open ? 'true' : 'false');
-      menu.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
-      document.body.classList.toggle('nav-open', open);
-    };
-
-    links.querySelectorAll('a').forEach(a => {
-      a.onclick = () => {
-        links.classList.remove('open');
-        menu.classList.remove('open');
-        menu.setAttribute('aria-expanded', 'false');
-        document.body.classList.remove('nav-open');
-      };
-    });
-
-    document.addEventListener('keydown', e => {
-      if (e.key === 'Escape' && links.classList.contains('open')) {
-        links.classList.remove('open');
-        menu.classList.remove('open');
-        menu.setAttribute('aria-expanded', 'false');
-        document.body.classList.remove('nav-open');
-      }
-    });
-
-    window.addEventListener('resize', () => {
-      if (window.innerWidth > 1120 && links.classList.contains('open')) {
-        links.classList.remove('open');
-        menu.classList.remove('open');
-        menu.setAttribute('aria-expanded', 'false');
-        document.body.classList.remove('nav-open');
-      }
-    }, {passive:true});
-  }
-
-  // Scroll reveal observer
+  // --- Cinematic Scroll Reveal Observer ---
   const obs = new IntersectionObserver(es => {
     es.forEach(e => {
       if (e.isIntersecting) {
@@ -283,17 +326,31 @@
         obs.unobserve(e.target);
       }
     });
-  }, {threshold:.1, rootMargin:'0px 0px -4%'});
+  }, {threshold:.08, rootMargin:'0px 0px -40px'});
   document.querySelectorAll('.reveal').forEach(x => obs.observe(x));
 
-  // Date input constraint: minimum today
+  // --- FAQ Accordion Behavior (Single open at a time) ---
+  const faqItems = document.querySelectorAll('.faq-item');
+  faqItems.forEach(item => {
+    item.addEventListener('toggle', () => {
+      if (item.open) {
+        faqItems.forEach(other => {
+          if (other !== item && other.open) {
+            other.removeAttribute('open');
+          }
+        });
+      }
+    });
+  });
+
+  // --- Date Input Minimum Constraint (Today or Future) ---
   const dateInput = document.getElementById('date');
   if (dateInput) {
     const today = new Date().toISOString().split('T')[0];
     dateInput.min = today;
   }
 
-  // Event Type Quick Chips
+  // --- Event Type Quick Chips ---
   const eventChips = document.querySelectorAll('#eventTypeChips .chip');
   const msgEl = document.getElementById('message');
   const charCount = document.getElementById('charCount');
@@ -319,7 +376,6 @@
         selectedEventType = ev;
         if (msgEl) {
           const prefix = `Celebrating: ${ev}`;
-          // Replace or prepend
           if (!msgEl.value.includes(prefix)) {
             msgEl.value = msgEl.value.trim() ? `${prefix}. ${msgEl.value}` : `${prefix}. `;
             if (charCount) charCount.textContent = msgEl.value.length + ' / 800';
@@ -329,9 +385,10 @@
     });
   });
 
-  // Pricing tier selection
+  // --- Pricing Tier Enquire Buttons ---
   document.querySelectorAll('.enquire-tier').forEach(a => {
-    a.addEventListener('click', () => {
+    a.addEventListener('click', e => {
+      e.preventDefault();
       const tier = a.dataset.tier;
       const note = 'Interested in the ' + tier + ' collection.';
       if (msgEl) {
@@ -340,14 +397,15 @@
           if (charCount) charCount.textContent = msgEl.value.length + ' / 800';
         }
       }
+      smoothScrollTo('#contact');
       const nameInput = document.getElementById('name');
       if (nameInput) {
-        setTimeout(() => nameInput.focus({preventScroll:true}), 300);
+        setTimeout(() => nameInput.focus({preventScroll:true}), 500);
       }
     });
   });
 
-  // Enquiry form submission
+  // --- Enquiry Form Submission to WhatsApp ---
   const enquiryForm = document.getElementById('enquiryForm');
   if (enquiryForm) {
     enquiryForm.addEventListener('submit', function(e) {
@@ -385,15 +443,14 @@
       }
 
       const text = `Hi Rakzs Studio! I'm ${name} (${phone}).\nEvent date: ${date}${city ? '\nVenue / city: ' + city : ''}${msg ? '\nDetails: ' + msg : ''}\nPlease share availability and collection details.`;
-      
+
       const waUrl = 'https://wa.me/918522059034?text=' + encodeURIComponent(text);
 
       if (status) {
-        status.textContent = '✓ Opening WhatsApp chat with details...';
+        status.textContent = '✓ Redirecting to WhatsApp chat with your details...';
         status.hidden = false;
       }
 
-      // Open WhatsApp cleanly
       const win = window.open(waUrl, '_blank', 'noopener,noreferrer');
       if (!win || win.closed || typeof win.closed === 'undefined') {
         window.location.href = waUrl;
