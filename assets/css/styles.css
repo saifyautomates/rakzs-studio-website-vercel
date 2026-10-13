@@ -117,3 +117,144 @@ body:hover .cursor-glow{opacity:1}
   transform: scale(1.12);
   box-shadow: 0 0 20px rgba(212,175,55,0.4);
 }
+
+
+/* ========================================================
+   WORLD-CLASS RESPONSIVE SYSTEM (Mobile, Tablet & Desktop)
+   ======================================================== */
+
+/* Ensure smooth touch scrolling on mobile */
+@media (max-width: 1120px) {
+  .nav-links {
+    overflow-y: auto !important;
+    padding-top: max(80px, env(safe-area-inset-top, 20px) + 60px) !important;
+    padding-bottom: max(40px, env(safe-area-inset-bottom, 20px) + 20px) !important;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* Tablet & Phablet (max-width: 768px) */
+@media (max-width: 768px) {
+  .section {
+    padding: clamp(64px, 12vw, 96px) 0 !important;
+  }
+  .form {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+  .field.full, .form-status, .error, .form .btn, .chips-group {
+    grid-column: 1 / -1 !important;
+  }
+}
+
+/* Mobile Screens (max-width: 640px) */
+@media (max-width: 640px) {
+  .category-grid {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+  .category {
+    aspect-ratio: 4/5 !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    margin-top: 0 !important;
+  }
+  .category:nth-child(even), .category:nth-child(odd) {
+    margin-inline: 0 !important;
+  }
+
+  /* Single Column Masonry for Impactful Mobile Viewing */
+  .masonry {
+    columns: 1 !important;
+    column-gap: 0 !important;
+  }
+  .shot {
+    margin-bottom: 16px !important;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  /* Horizontal Swipe Filters with Hidden Scrollbar */
+  .portfolio-head {
+    display: block !important;
+  }
+  .filters {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    scrollbar-width: none !important;
+    -webkit-overflow-scrolling: touch;
+    gap: 8px !important;
+    padding: 18px 0 6px !important;
+    margin-top: 14px !important;
+  }
+  .filters::-webkit-scrollbar {
+    display: none !important;
+  }
+  .filter {
+    flex: 0 0 auto !important;
+    white-space: nowrap !important;
+    min-height: 42px !important;
+    padding: 0 16px !important;
+    border: 1px solid var(--line) !important;
+    border-radius: 24px !important;
+    font-size: 0.65rem !important;
+  }
+  .filter.active {
+    background: rgba(212,175,55,0.15) !important;
+    border-color: var(--gold) !important;
+  }
+
+  /* Mobile Hide Lightbox Keyboard Shortcuts */
+  .lb-hints {
+    display: none !important;
+  }
+
+  /* Testimonials on Mobile */
+  .testimonials-grid {
+    grid-template-columns: 1fr !important;
+    gap: 14px !important;
+  }
+  .test-card {
+    padding: 28px 22px !important;
+  }
+
+  /* Tiers on Mobile */
+  .tier {
+    padding: 32px 22px !important;
+  }
+}
+
+/* Small Handhelds (iPhone SE, Galaxy A-series, max-width: 380px) */
+@media (max-width: 380px) {
+  .shell, .hero-copy {
+    width: calc(100% - 24px) !important;
+  }
+  .hero h1 {
+    font-size: 2.85rem !important;
+    line-height: 0.92 !important;
+  }
+  .hero-bottom {
+    margin-top: 22px !important;
+  }
+  .actions {
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+  }
+  .btn {
+    width: 100% !important;
+    min-height: 48px !important;
+    padding-inline: 16px !important;
+  }
+  .direct-row {
+    grid-template-columns: 32px 1fr auto !important;
+    padding: 16px 0 !important;
+  }
+  .chips-row {
+    gap: 6px !important;
+  }
+  .chip {
+    padding: 6px 11px !important;
+    font-size: 0.62rem !important;
+  }
+}
